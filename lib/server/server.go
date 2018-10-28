@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/zoocasa/presignS3/lib/sign"
+	"github.com/slowmanchan/presignS3URL/lib/sign"
 )
 
 func Start() {
@@ -13,13 +13,14 @@ func Start() {
 		key := r.URL.Query().Get("key")
 		signedURL, err := sign.URL(key)
 		if err != nil {
-			log.Print(err)
+			http.Error(w, err.Error(), 500)
 		}
 		w.Write(signedURL)
 	})
 
-	fmt.Println("Server started")
-	if err := http.ListenAndServe(":9090", nil); err != nil {
+	port := "9090"
+	fmt.Printf("Server started on Port: %v...\n", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 }

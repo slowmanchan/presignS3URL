@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/pkg/errors"
 )
 
 // URL...
@@ -28,7 +29,7 @@ func URL(key string) ([]byte, error) {
 
 	urlStr, err := req.Presign(2 * time.Minute)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "error presigning")
 	}
 
 	return []byte(urlStr), nil

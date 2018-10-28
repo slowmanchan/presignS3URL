@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/zoocasa/presignS3/lib/server"
+	"github.com/slowmanchan/presignS3URL/lib/server"
 )
 
 func main() {
