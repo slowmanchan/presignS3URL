@@ -1,6 +1,7 @@
 package sign
 
 import (
+	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -12,20 +13,23 @@ import (
 
 // URL...
 func URL(key string) ([]byte, error) {
-	accessKeyID := "AKIAIP7LDPSLWSEZIWQQ"
-	secretAccessKey := "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"
-
-	sess := session.New(&aws.Config{
+	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String("us-east-1"),
-		Credentials: credentials.NewStaticCredentials(accessKeyID, secretAccessKey, ""),
+		Credentials: credentials.NewStaticCredentials(os.Getenv("ACCESS_ID"), os.Getenv("ACCESS_KEY"), ""),
 	})
-
+	if err != nil {
+		return nil, errors.Wrap(err, "error logging in")
+	}
 	svc := s3.New(sess)
 
-	req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
+	req, res := svc.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String("zoocasa.importer-go"),
 		Key:    aws.String(key),
 	})
+
+	if res.ContentLength == nil {
+		return nil, errors.New("no file found with provided key")
+	}
 
 	urlStr, err := req.Presign(2 * time.Minute)
 	if err != nil {
